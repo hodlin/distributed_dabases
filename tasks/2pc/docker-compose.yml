@@ -1,0 +1,74 @@
+version: '3.9'
+services:
+
+  flight_db:
+    image: postgres:11
+
+    command:
+      - "postgres"
+      - "-c"
+      - "superuser_reserved_connections=3"
+      - "-c"
+      - "max_connections=10"
+      - "-c"
+      - "max_prepared_transactions=5"
+      - "-c"
+      - "max_wal_senders=3"
+
+    ports:
+      - '5001:5432'
+    network_mode: bridge
+    container_name: flights_db
+
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'pgpass'
+      POSTGRES_DB: 'postgres'
+
+  hotel_db:
+    image: postgres:11
+
+    command:
+      - "postgres"
+      - "-c"
+      - "superuser_reserved_connections=3"
+      - "-c"
+      - "max_connections=10"
+      - "-c"
+      - "max_prepared_transactions=5"
+      - "-c"
+      - "max_wal_senders=3"
+
+    ports:
+      - '5002:5432'
+    network_mode: bridge
+    container_name: hotel_db
+
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'pgpass'
+      POSTGRES_DB: 'postgres'
+
+  account_db:
+    image: postgres:11
+
+    command:
+      - "postgres"
+      - "-c"
+      - "superuser_reserved_connections=3"
+      - "-c"
+      - "max_connections=10"
+      - "-c"
+      - "max_prepared_transactions=5"
+      - "-c"
+      - "max_wal_senders=3"
+
+    ports:
+      - '5003:5432'
+    network_mode: bridge
+    container_name: account_db
+
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'pgpass'
+      POSTGRES_DB: 'postgres'
