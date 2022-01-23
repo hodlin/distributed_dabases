@@ -1,0 +1,85 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('e_shop');
+
+// The drop() command destroys all data from a collection.
+// Make sure you run it against the correct database and collection.
+db.inventory.drop();
+
+// Insert a few documents into the sales collection.
+db.inventory.insertMany([
+  { '_id': 1, 'item': 'Ipnone 11', 'memory': '64Gb', 'price': 18499, 'producer': 'Apple', 'category': 'Smartphones' },
+  { '_id': 2, 'item': 'Ipnone 13', 'price': 29999, 'producer': 'Apple', 'category': 'Smartphones' },
+  { '_id': 3, 'item': 'Ipnone 13 Pro', 'price': 37499, 'producer': 'Apple', 'category': 'Smartphones' },
+  { '_id': 4, 'item': 'Ipnone 13 Pro Max', 'memory': '128Gb', 'price': 41499, 'producer': 'Apple', 'category': 'Smartphones' },
+  { '_id': 5, 'item': 'Galaxy S21 FE', 'memory': '64Gb', 'price': 21999, 'producer': 'Samsung', 'category': 'Smartphones' },
+  { '_id': 6, 'item': 'Galaxy S21', 'memory': '128Gb', 'price': 22999, 'producer': 'Samsung', 'category': 'Smartphones' },
+  { '_id': 7, 'item': 'Galaxy S21 Plus', 'price': 23999, 'producer': 'Samsung', 'category': 'Smartphones' },
+  { '_id': 8, 'item': 'Galaxy S21 Ultra', 'price': 39999, 'producer': 'Samsung', 'category': 'Smartphones' },
+  { '_id': 9, 'item': 'Apple Watch Series 7', 'connectivity': ['WiFi', 'Bluetooth'], 'price': 13999, 'type': 'smartwatch', 'producer': 'Samsung', 'category': 'Wearables' },
+  { '_id': 10, 'item': 'Galaxy Watch 4 Classic', 'connectivity': ['WiFi', 'Bluetooth', 'LTE'], 'price': 11499, 'type': 'smartwatch', 'producer': 'Apple', 'category': 'Smartphones' },
+  { '_id': 11, 'item': 'Galaxy Tab S7',  'memory': '128Gb', 'display': '11.4"', 'price': 23999, 'producer': 'Samsung', 'category': 'Tablets' },
+  { '_id': 12, 'item': 'iPad Pro',  'memory': '128Gb', 'display': '12.9"', 'price': 41999, 'producer': 'Apple', 'category': 'Tablets' },
+  { '_id': 13, 'item': 'Samsung QE55', 'technology': 'QLED', 'price': 30999, 'producer': 'Samsung', 'category': 'TV' },
+  { '_id': 14, 'item': 'Hisense 55E', 'technology': 'IPS', 'price': 19999, 'producer': 'Hisense', 'category': 'TV' },
+  { '_id': 15, 'item': 'LG OLED55', 'technology': 'OLED', 'price': 41999, 'producer': 'LG', 'category': 'TV' },
+  { '_id': 16, 'item': 'Philips 55OLED', 'technology': 'OLED', 'price': 45999, 'producer': 'Philips', 'category': 'TV' },
+]);
+
+// Select all items from inventory
+db.inventory.find();
+
+// Calculate number of items in each Category
+db.inventory.aggregate(
+    [
+        {$match: {}},
+        {$group: {_id: "$category", number_of_products: {$sum: 1 }}}
+    ]
+);
+
+// Calculate number of unique categories
+db.inventory.distinct("category").length
+
+// Display all producers
+db.inventory.distinct("producer")
+
+// Fint items by price and category
+db.inventory.find({
+        $and: [
+            {category: "TV"}, 
+            {price: {$gt: 10000, $lt: 25000}},
+    ]
+    });
+
+// Fint items from listed producers
+db.inventory.find({
+    producer: {$in: ["LG", "Hisense"]}
+    });
+
+// Update some items changing available field and adding new one
+db.inventory.updateMany(
+    {producer: "LG"},
+    {$set: {year: 2021}}
+);
+
+db.inventory.updateMany(
+    {producer: "LG"},
+    {$mul: {price: 0.9}}
+);
+
+db.inventory.find({producer: "LG"});
+
+// Find item which has specific field
+db.inventory.find({connectivity: {$exists: true}});
+
+// Increase price of selected items
+db.inventory.updateMany(
+    {connectivity: {$exists: true}},
+    {$inc: {price: 10000}}
+);
+
+db.inventory.find({connectivity: {$exists: true}});
