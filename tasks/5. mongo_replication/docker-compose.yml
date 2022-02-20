@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  mongodb_node_1:
+    container_name: mongodb_node_1
+    image: mongo:4.4
+    volumes:
+      - ./rs0-init.sh:/scripts/rs0-init.sh
+      - ./rs0-init-delayed-member.sh:/scripts/rs0-init-delayed-member.sh
+      - ./mongo_logs/rs0-1:/var/log/mongodb
+    networks:
+      - mongo-rs0-network
+    ports:
+      - 10001:27017
+    links:
+      - mongodb_node_2
+      - mongodb_node_3
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongodb_node_2:
+    container_name: mongodb_node_2
+    image: mongo:4.4
+    volumes:
+      - ./mongo_logs/rs0-2:/var/log/mongodb
+    networks:
+      - mongo-rs0-network
+    ports:
+      - 10002:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongodb_node_3: 
+    container_name: mongodb_node_3
+    image: mongo:4.4
+    volumes:
+      - ./mongo_logs/rs0-3:/var/log/mongodb
+    networks:
+      - mongo-rs0-network
+    ports:
+      - 10003:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+  
+  jupyter:
+    container_name: jupyter
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - mongo-rs0-network
+    ports:
+      - 8888:8888
+    volumes:
+      - ./notebooks:/src/notebooks
+
+networks:
+  mongo-rs0-network:
+    driver: bridge

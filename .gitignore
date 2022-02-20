@@ -1,3 +1,6 @@
 *.ini
 .vscode
 cassandra_data
+data/sr0-*/*
+mongo_logs/sr0-*/*
+.ipynb_checkpoints
