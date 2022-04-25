@@ -1,0 +1,82 @@
+version: '3.9'
+
+services:
+  hazelcast_node_1:
+    container_name: hazelcast_node_1
+    image: hazelcast/hazelcast:5.0.2
+    volumes:
+      - ./hazelcast.yml:/opt/hazelcast/hazelcast.yml
+    networks:
+      - hazelcast-network
+    environment:
+      - HAZELCAST_CONFIG=hazelcast.yml
+      - HZ_CLUSTERNAME=dev
+      - LOGGING_LEVEL=DEBUG
+    ports:
+      - 10001:5701
+    links:
+      - hazelcast_node_2
+      - hazelcast_node_3
+    restart: always
+
+  hazelcast_node_2:
+    container_name: hazelcast_node_2
+    image: hazelcast/hazelcast:5.0.2
+    volumes:
+      - ./hazelcast.yml:/opt/hazelcast/hazelcast.yml
+    networks:
+      - hazelcast-network
+    environment:
+      - HAZELCAST_CONFIG=hazelcast.yml
+      - HZ_CLUSTERNAME=dev
+      - LOGGING_LEVEL=DEBUG
+    ports:
+      - 10002:5701
+    restart: always
+
+  hazelcast_node_3:
+    container_name: hazelcast_node_3
+    image: hazelcast/hazelcast:5.0.2
+    volumes:
+      - ./hazelcast.yml:/opt/hazelcast/hazelcast.yml
+    networks:
+      - hazelcast-network
+    environment:
+      - HAZELCAST_CONFIG=hazelcast.yml
+      - HZ_CLUSTERNAME=dev
+      - LOGGING_LEVEL=DEBUG
+    ports:
+      - 10003:5701
+    restart: always
+  
+  jupyter:
+    container_name: jupyter
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - hazelcast-network
+    ports:
+      - 8888:8888
+    volumes:
+      - ./notebooks:/src/notebooks
+
+  management_centre:
+    container_name: management_centre
+    image: hazelcast/management-center:5.0.4
+    networks:
+      - hazelcast-network
+    environment:
+      - LOGGING_LEVEL=DEBUG
+      - MC_ADMIN_USER=admin
+      - MC_ADMIN_PASSWORD=SuperSecretPassword228
+      - MC_DEFAULT_CLUSTER=dev
+      - MC_DEFAULT_CLUSTER_MEMBERS=hazelcast_node_1:5701,hazelcast_node_2:5701,hazelcast_node_3:5701
+    ports:
+      - 8080:8080
+      - 8081:8081
+    restart: always
+
+networks:
+  hazelcast-network:
+    driver: bridge
